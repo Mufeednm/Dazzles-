@@ -15,37 +15,41 @@ datasource db {
 
 model Admin {
   id Int @id @default(autoincrement())
-name String?
+name String @unique
 email String @unique
 password String
 created_at DateTime @default(now())
 }
 
-model Customers {
-  id Int @id @default(autoincrement())
-name String?
-email String @unique
-mobile_number String @unique
-memberShip String
-
-
-created_at DateTime @default(now())
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  created_at DateTime @default(now())
+  permissionID Int 
+  staff     Staff[]  // One-to-many relationship: A role can have many staff
+  permission permission @relation(fields: [permissionID],references: [id])
+}
+model permission {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  role     Role[] // One-to-many relationship: A role can have many staff
+  created_at DateTime @default(now())
+  
 }
 
-model Products {
-  id Int @id @default(autoincrement())
-product_name String?
-category String
-supplier String
-size String
-color String
-description String
-stock Int
-price Int
-
-
-
+model Staff {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  email      String   @unique
+  password   String
+  roleId     Int      // Foreign key to the Role model
+  created_at DateTime @default(now())
+  
+  role       Role     @relation(fields: [roleId], references: [id]) // Relation field
 }
+
+
+
 
 
 
