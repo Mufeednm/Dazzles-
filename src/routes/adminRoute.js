@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { createAdmin, createPermission, createRole, createUser,deleteUser,roleDetails,showUser, updateRole, updateUser } from "../Controllers/adminController.js";
+import { createAdmin } from "../Controllers/admin/adminControllers.js";
+import { createUser, deleteUser, showUser, updateUser } from "../Controllers/admin/userControllers.js";
+import { createRole, roleDetails, updateRole } from "../Controllers/admin/roleControllers.js";
+import { createPermission } from "../Controllers/admin/permissionControllers.js";
 
 const router =Router()
 
