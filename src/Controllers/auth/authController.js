@@ -1,4 +1,7 @@
 import prisma from "../../database/db.config.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
 
 export const login = async (req, res) => {
   const { username, password } = req.body;
@@ -9,51 +12,33 @@ export const login = async (req, res) => {
   }
 
   try {
-    let user;
+   
+    const hashedPassword = await bcrypt.hash(password, 10); 
 
     // 1. Check in the Admin table
-    user = await prisma.admin.findUnique({
-      where: { name: username },
-    });
-
-    if (user) {
-      // Validate the password for Admin
-      if (user.password !== password) {
-        return res.status(401).json({ message: "Incorrect password" });
-      }
+    let user= await prisma.login.create({
+   data: { userName: username,
+        userPassword:hashedPassword,
+      
+    },
+  });
+  
+  const token = jwt.sign(
+    {  name: user.userName }, // Payload
+    process.env.JWT_SECRET,         // Secret key
+    { expiresIn: "1h" }             // Token expiry
+  );
+ 
 
       return res.status(200).json({
-        status: 200,
-        role: "admin",
         message: "Login successful, redirecting to Admin page",
         data: user,
+        token:token
       });
-    }
+    
 
     // 2. If not found in Admin, check in the Staff table (and fetch their Role)
-    user = await prisma.staff.findUnique({
-      where: { name: username },
-      include: { role: true }, // Include the associated Role model
-    });
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Validate the password for Staff
-    if (user.password !== password) {
-      return res.status(401).json({ message: "Incorrect password" });
-    }
-
-    // Check the role of the Staff user
-    const userRole = user.role.name; // Access the role name from the Role model
-
-    return res.status(200).json({
-      status: 200,
-      role: userRole,
-      message: `Login successful, redirecting to ${userRole} page`,
-      data: user,
-    });
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({ message: "Server error" });
