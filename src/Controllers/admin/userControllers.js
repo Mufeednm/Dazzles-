@@ -10,16 +10,17 @@ export const createUser = async (req, res) => {
     return res.status(400).json({ error: "All fields are required" });
   }
 
+  if (!Array.isArray(roleIds) || roleIds.length === 0) {
+    return res .status(400).json({ error: "Role IDs must be provided as a non-empty array" });}
+
   try {
     // Check if the user already exists
     const existingUser = await prisma.users.findFirst({
-      where: { userName: username },
+      where: { userEmail: email },
     });
 
     if (existingUser) {
-      return res
-        .status(400)
-        .json({ error: "User with this username already exists" });
+      return res.status(400).json({ error: "A user with this email already exists" });
     }
 
     // Create the user
@@ -27,29 +28,76 @@ export const createUser = async (req, res) => {
       data: {
         userName: username,
         userEmail: email,
-        userPassword: password,
+        userPassword: password, // Consider hashing the password (e.g., bcrypt)
         userStore,
       },
     });
 
     // Create UserRole records for each roleId
     for (const roleId of roleIds) {
-      await prisma.userRole.create({
+      await prisma.user_roles.create({
         data: {
           userId: newUser.userId,
-          roleId,
+         roleId,
         },
       });
     }
-
-    return res
-      .status(201)
-      .json({ message: "New user created successfully", newUser });
+    return res.status(201).json({ message: "New user created successfully", newUser });
   } catch (error) {
-    console.error(error);
+    console.error("Error creating user:", error);
     return res.status(500).json({ error: "Failed to create user" });
   }
 };
+
+
+
+  // update the user role and other details
+export const userUpdate=async (req,res)=>{
+const id = parseInt( req.params.id)
+const { username, email, password, roleIds, userStore } = req.body;
+ 
+try {
+  const existingUser = await prisma.users.findUnique({
+    where: { userId: id },
+  });
+
+  if (!existingUser) {
+    return res.status(400).json({ error: "user not found" });
+  }
+
+ await prisma.users.updateMany({
+    where: { userId: id,},
+    data: {
+      userName: username,
+      userEmail: email,
+      userPassword: password, // Consider hashing the password (e.g., bcrypt)
+      userStore :userStore,
+      update_at: new Date ()
+    },
+  });
+
+  await prisma.user_roles.deleteMany({
+    where: { userId: id },
+  });
+
+  const userrole = roleIds.map((roleId) => ({
+    userId: id,
+    roleId,
+  }));
+
+  await prisma.user_roles.createMany({
+    data: userrole,
+  });
+
+  return res .status(201).json({ message: "user updated successfully",});
+
+} catch (error) {
+  console.error("Error updating user:", error);
+  return res.status(500).json({ error: "Failed to update user" });
+}
+}
+
+
 
 //  showw all users
 export const showUser = async (req, res) => {
@@ -124,43 +172,22 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-export const updateUser = async (req, res) => {
-  const id = parseInt(req.params.id); // Convert to integer
-  const { username, email, password, roleId, userStore } = req.body;
 
+export const deleteAllUsers = async (req, res) => {
   try {
-    // Check if the user exists
-    const user = await prisma.users.findUnique({
-      where: {
-        userId: id,
-      },
-    });
+    // Delete all user roles first
+    await prisma.user_roles.deleteMany({});
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    // Then delete all users
+    await prisma.users.deleteMany({});
 
-    // Update the user's isDeleted field to true
-    const updatedUser = await prisma.users.update({
-      where: {
-        userId: id,
-      },
-      data: {
-        userName: username,
-        userEmail: email,
-        userPassword: password,
-        userRole: roleId,
-        userStore: userStore,
-        update_at: new Date(),
-      },
-    });
+   
 
     return res.status(200).json({
-      message: "User marked as deleted successfully",
-      data: updatedUser,
+      message: "All users and their roles deleted, IDs reset to 1",
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: "Failed to delete user" });
+    return res.status(500).json({ error: "Failed to delete users and reset IDs" });
   }
 };

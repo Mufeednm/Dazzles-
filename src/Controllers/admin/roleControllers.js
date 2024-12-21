@@ -29,7 +29,7 @@ export const createRole = async (req, res) => {
   
       // Assign permissions to the role
       for (const permissionId of permissionIDs) {
-        await prisma.RolePermission.create({
+        await prisma.role_permissions.create({
           data: {
             roleId: newRole.roleId,
             permissionId,

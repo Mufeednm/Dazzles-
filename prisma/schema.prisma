@@ -19,14 +19,14 @@ model login {
 model global_permission {
   permissionId Int              @id @default(autoincrement())
   permission   String           @db.VarChar(100)
-  roles        RolePermission[]
+  roles         role_permissions[]  // Cascade on delete
 }
 
 model role {
   roleId      Int              @id @default(autoincrement())
   roleName    String
-  permissions RolePermission[]
-  users       UserRole[]
+  permissions role_permissions[]  // Cascade on delete
+  users       user_roles[] 
 }
 
 model users {
@@ -38,28 +38,28 @@ model users {
   create_at    DateTime   @default(now()) @db.Timestamp(6)
   update_at    DateTime?  @db.Timestamp(6)
   isDeleted    Boolean    @default(false)
-  roles        UserRole[]
+  roles        user_roles[]  // Cascade on delete
 }
 
-model UserRole {
+model user_roles {
   id         Int      @id @default(autoincrement())
   userId     Int
   roleId     Int
   assignedAt DateTime @default(now())
-  role       role     @relation(fields: [roleId], references: [roleId])
-  user       users    @relation(fields: [userId], references: [userId])
+  role       role     @relation(fields: [roleId], references: [roleId], onDelete: Cascade) // Cascade on delete
+  user       users    @relation(fields: [userId], references: [userId], onDelete: Cascade) // Cascade on delete
 
   @@unique([userId, roleId])
 }
 
-model RolePermission {
+model role_permissions {
   id           Int               @id @default(autoincrement())
   roleId       Int
   permissionId Int
   assignedAt   DateTime          @default(now())
   updateAt     DateTime?
-  permission   global_permission @relation(fields: [permissionId], references: [permissionId])
-  role         role              @relation(fields: [roleId], references: [roleId])
+  permission   global_permission @relation(fields: [permissionId], references: [permissionId], onDelete: Cascade) // Cascade on delete
+  role         role              @relation(fields: [roleId], references: [roleId], onDelete: Cascade) // Cascade on delete
 
   @@unique([roleId, permissionId])
 }
