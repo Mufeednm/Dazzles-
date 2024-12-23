@@ -34,11 +34,11 @@ model users {
   userName     String     @db.VarChar(255)
   userEmail    String     @db.VarChar(255)
   userPassword String     @db.VarChar(255)
-  userStore    Int
   create_at    DateTime   @default(now()) @db.Timestamp(6)
   update_at    DateTime?  @db.Timestamp(6)
   isDeleted    Boolean    @default(false)
-  roles        user_roles[]  // Cascade on delete
+  roles        user_roles[]
+  stores store_users[]  // Cascade on delete
 }
 
 model user_roles {
@@ -62,4 +62,35 @@ model role_permissions {
   role         role              @relation(fields: [roleId], references: [roleId], onDelete: Cascade) // Cascade on delete
 
   @@unique([roleId, permissionId])
+}
+
+
+model store {
+  storeId        Int        @id @default(autoincrement())
+  storeName     String     @db.VarChar(255)
+  storeShortName    String     @db.VarChar(255)
+  storeAddress String     @db.VarChar(255)
+  storeLattitude String     @db.VarChar(255)
+  storeLongitude String     @db.VarChar(255)
+  storePhone String     @db.VarChar(255)
+  storeGST String     @db.VarChar(255)
+  storeAPIKey String     @db.VarChar(255)
+  alternateStoreName    String   @db.VarChar(255)
+  alternateStoreAddress String     @db.VarChar(255)
+  alternateStoreGST String     @db.VarChar(255)
+  invoicePrefix String     @db.VarChar(255)
+  invoiceNumber Int     
+  whatsappNumber String     @db.VarChar(255)
+  whatsappAPI String  ?   @db.VarChar(255)
+  create_at    DateTime   @default(now()) @db.Timestamp(6)
+  update_at    DateTime?  @db.Timestamp(6)
+  isDeleted    Boolean    @default(false)
+  user        store_users[]    
+}
+model store_users {
+  storeId Int
+  userId  Int
+  storeUser   store @relation(fields: [storeId], references: [storeId], onDelete: Cascade)
+  userStore    users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  @@id([storeId, userId]) // Composite primary key
 }

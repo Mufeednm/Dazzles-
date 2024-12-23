@@ -1,4 +1,4 @@
-import prisma from "../database/db.config.js"
+import prisma from "../../database/db.config.js"
 
 export const createCustomer =async(req,res)=>{
     const {name ,email,mobile_number ,memberShip}=req.body

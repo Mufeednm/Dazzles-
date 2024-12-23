@@ -74,7 +74,7 @@ export const roleDetails =async (req,res)=>{
     }));
   
     console.log(formattedroleDetails);
-     return res.status(201).json({ message :"role details",data:roleDetails });
+     return res.status(201).json({ message :"role details",data:formattedroleDetails });
   } catch (error) {
      console.error(error);
       return res.status(500).json({ error: 'Failed to role details' });
@@ -82,37 +82,81 @@ export const roleDetails =async (req,res)=>{
   
   }
   
-  
+export const allRoles =async (req,res)=>{
+  try {
+    
+    const allRole = await prisma.role.findMany()
+    return res.status(201).json({ message :"all role ",data:allRole });
+  } catch (error) {
+       console.error('Error updating all roles:');
+      return res.status(500).json({
+        error: error.message || 'Failed to update permissions',})
+  }
+ 
+}
+
+
+
   export const updateRole = async (req, res) => {
     const id = parseInt(req.params.id, 10);
     const { permissionIDs } = req.body;
   
+    // Validate input
+    if (!id || !Array.isArray(permissionIDs) || permissionIDs.length === 0) {
+      return res.status(400).json({ error: 'Invalid input: role ID and permissions are required' });
+    }
+  
     try {
-      const existingRole = await prisma.role.findUnique({
-        where: { roleId: id },
+      // Use a transaction to ensure all operations succeed or fail together
+      const result = await prisma.$transaction(async (prisma) => {
+        // Check if the role exists
+        const existingRole = await prisma.role.findUnique({
+          where: { roleId: id },
+        });
+  
+        if (!existingRole) {
+          throw new Error('Role not found');
+        }
+  
+        // Delete existing permissions for the role
+        await prisma.role_permissions.deleteMany({
+          where: { roleId: id },
+        });
+  
+        // Add new permissions
+        const rolePermissions = permissionIDs.map((permissionId) => ({
+          roleId: id,
+          permissionId,
+        }));
+  
+        await prisma.role_permissions.createMany({
+          data: rolePermissions,
+        });
+  
+        // Return the updated role with its permissions
+        const updatedRole = await prisma.role.findUnique({
+          where: { roleId: id },
+          include: {
+            permissions: {
+              include: {
+                permission: true, // Include permission details
+              },
+            },
+          },
+        });
+  
+        return updatedRole;
       });
   
-      if (!existingRole) {
-        return res.status(404).json({ error: 'Role not found' });
-      }
-      await prisma.rolePermission.deleteMany({
-        where: { roleId: id },
+      return res.status(200).json({
+        message: 'Role permissions updated successfully',
+        data: result,
       });
-  
-      const rolePermissions = permissionIDs.map((permissionId) => ({
-        roleId: id,
-        permissionId,
-      }));
-  
-      await prisma.rolePermission.createMany({
-        data: rolePermissions,
-      });
-  
-      return res.status(200).json({ message: 'Role permissions updated successfully',data:rolePermissions });
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Failed to update permissions' });
+      console.error('Error updating role permissions:', error.message);
+      return res.status(500).json({
+        error: error.message || 'Failed to update permissions',
+      });
     }
   };
-  
   

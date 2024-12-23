@@ -1,7 +1,7 @@
 
-// create users
-
 import prisma from "../../database/db.config.js";
+import bcrypt from "bcrypt";
+
 
 export const createUser = async (req, res) => {
   const { username, email, password, roleIds, userStore } = req.body;
@@ -22,13 +22,19 @@ export const createUser = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ error: "A user with this email already exists" });
     }
-
+    const hashedPassword = await bcrypt.hash(password, 15); 
     // Create the user
     const newUser = await prisma.users.create({
       data: {
         userName: username,
         userEmail: email,
-        userPassword: password, // Consider hashing the password (e.g., bcrypt)
+        userPassword: hashedPassword, // Consider hashing the password (e.g., bcrypt)
+       
+      },
+    });
+    await prisma.store_users.create({
+      data: {
+        userId: newUser.userId,
         userStore,
       },
     });
@@ -64,18 +70,23 @@ try {
   if (!existingUser) {
     return res.status(400).json({ error: "user not found" });
   }
-
+  // const hashedPassword = await bcrypt.hash(password, 15); 
  await prisma.users.updateMany({
     where: { userId: id,},
     data: {
       userName: username,
-      userEmail: email,
+      // userEmail: email,
       userPassword: password, // Consider hashing the password (e.g., bcrypt)
-      userStore :userStore,
+   
       update_at: new Date ()
     },
   });
-
+  await prisma.store_users.update({
+    data: {
+      userId: newUser.userId,
+      userStore: userStore,
+    },
+  });
   await prisma.user_roles.deleteMany({
     where: { userId: id },
   });
