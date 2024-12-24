@@ -66,8 +66,8 @@ try {
     return res.status(400).json({ error: "user not found" });
   }
   // const hashedPassword = await bcrypt.hash(password, 15); 
- await prisma.users.updateMany({
-    where: { userId: id,},
+ await prisma.store.updateMany({
+    where: { storeId: id,},
     data: {
         storeName: storeName, 
         storeShortName: storeShortName,
@@ -112,6 +112,26 @@ export const showStores = async (req, res) => {
     return res.status(500).json({ error: "Failed to retrieve stores" });
   }
 };
+export const storeUsers = async (req, res) => {
+  const id = parseInt(req.params.id,);
+  try {
+   const stores=  await prisma.store_users.findFirst({
+    where:{storeId:id},
+    include:{userStore:{ select: {
+      userName: true,
+      userEmail: true, 
+    }} }
+  
+   });
+    return res.status(200).json({ message: "Store retrieved successfully",data:stores});
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to retrieve stores" });
+  }
+};
+
+
+
 
 //  delete user
 export const deletestore = async (req, res) => {
@@ -141,7 +161,7 @@ export const deletestore = async (req, res) => {
 
     return res.status(200).json({
       message: "store marked as deleted successfully",
-      data: updatedUser,
+  
     });
   } catch (error) {
     console.error(error);

@@ -16,6 +16,21 @@ model login {
   userStatus   Boolean @default(true)
 }
 
+
+model customer{
+  customerId       Int        @id @default(autoincrement())
+customerName     String     @db.VarChar(255)
+customerEmail    String     @db.VarChar(255)
+	customerMobile String     @db.VarChar(255)
+	customerAddress	 String     @db.VarChar(255)
+	baseStore	 Int   
+	customerMembership	 String     @db.VarChar(255)
+  create_at    DateTime   @default(now()) @db.Timestamp(6)
+  update_at    DateTime?  @db.Timestamp(6)
+  isDeleted    Boolean    @default(false)
+
+}
+
 model global_permission {
   permissionId Int              @id @default(autoincrement())
   permission   String           @db.VarChar(100)

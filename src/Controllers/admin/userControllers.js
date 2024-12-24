@@ -35,8 +35,7 @@ export const createUser = async (req, res) => {
     await prisma.store_users.create({
       data: {
         userId: newUser.userId,
-        userStore,
-      },
+        storeId: userStore, }
     });
 
     // Create UserRole records for each roleId
@@ -71,7 +70,7 @@ try {
     return res.status(400).json({ error: "user not found" });
   }
   // const hashedPassword = await bcrypt.hash(password, 15); 
- await prisma.users.updateMany({
+const updateUser= await prisma.users.updateMany({
     where: { userId: id,},
     data: {
       userName: username,
@@ -82,11 +81,17 @@ try {
     },
   });
   await prisma.store_users.update({
+    where: {
+      storeId_userId: {
+        storeId: userStore,
+        userId: id,
+      },
+    },
     data: {
-      userId: newUser.userId,
-      userStore: userStore,
+      storeId: userStore,
     },
   });
+  
   await prisma.user_roles.deleteMany({
     where: { userId: id },
   });

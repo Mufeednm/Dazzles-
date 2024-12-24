@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { createCustomer } from "../Controllers/customer/customerController.js";
+import { createCustomer, deleteCustomer, updateCustomer } from "../Controllers/customer/customerController.js";
 
 const router =Router()
 
-router.post('/',createCustomer)
+router.post('/customer',createCustomer)
+router.patch('/customer/:id',updateCustomer)
+router.patch('/delete/:id',deleteCustomer)
 
 export default router
