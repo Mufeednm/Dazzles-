@@ -16,7 +16,6 @@ model login {
   userStatus   Boolean @default(true)
 }
 
-
 model customer{
   customerId       Int        @id @default(autoincrement())
 customerName     String     @db.VarChar(255)
@@ -28,20 +27,37 @@ customerEmail    String     @db.VarChar(255)
   create_at    DateTime   @default(now()) @db.Timestamp(6)
   update_at    DateTime?  @db.Timestamp(6)
   isDeleted    Boolean    @default(false)
-
+  customerVisits  customer_visit[]
 }
 
-model global_permission {
-  permissionId Int              @id @default(autoincrement())
-  permission   String           @db.VarChar(100)
-  roles         role_permissions[]  // Cascade on delete
-}
+model customer_visit {
+  visitId             Int      @id @default(autoincrement())
+  storeId            Int?
+  customerId         Int 
+  eventDate          DateTime?
+  sampleDate         DateTime?
+  boomerangDate      DateTime?
+  purchaseDate       DateTime?
+  cityId             Int?
+  bridalEvents       String
+  generalOcassions   String
+  salesPersonId      Int?
+  supportExecutiveId Int?
+  supervisorId       Int?
+  catalystId         Int?
+  consultantId       Int?
+  serviceType        String   @default("FSS")
+  notes              String?
+  status             String   @default("ACTIVE")
+  remarks            String?
+  createdBy          Int?
+  create_at    DateTime   @default(now()) @db.Timestamp(6)
+  update_at    DateTime?  @db.Timestamp(6)
 
-model role {
-  roleId      Int              @id @default(autoincrement())
-  roleName    String
-  permissions role_permissions[]  // Cascade on delete
-  users       user_roles[] 
+visitedStore store? @relation(fields: [storeId],references: [storeId])
+  customerVisited customer @relation(fields: [customerId], references: [customerId])
+  userCreateds    users?   @relation(fields: [createdBy], references: [userId])
+
 }
 
 model users {
@@ -54,6 +70,26 @@ model users {
   isDeleted    Boolean    @default(false)
   roles        user_roles[]
   stores store_users[]  // Cascade on delete
+   visitorCreated customer_visit[]
+}
+
+
+
+
+model role {
+  roleId      Int              @id @default(autoincrement())
+  roleName    String
+  permissions role_permissions[]  // Cascade on delete
+  users       user_roles[] 
+}
+
+
+
+
+model global_permission {
+  permissionId Int              @id @default(autoincrement())
+  permission   String           @db.VarChar(100)
+  roles         role_permissions[]  // Cascade on delete
 }
 
 model user_roles {
@@ -100,8 +136,12 @@ model store {
   create_at    DateTime   @default(now()) @db.Timestamp(6)
   update_at    DateTime?  @db.Timestamp(6)
   isDeleted    Boolean    @default(false)
-  user        store_users[]    
+  user        store_users[]   
+  customerVisited customer_visit[] 
 }
+
+
+
 model store_users {
   storeId Int
   userId  Int
