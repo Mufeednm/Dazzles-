@@ -2,18 +2,23 @@ import prisma from "../../database/db.config.js"
 
 export const createCustomer =async(req,res)=>{
     const {customerName ,customerEmail,customerMobile ,customerAddress,baseStore,customerMembership}=req.body
-  
-   await prisma.customer.create ({
+  try {
+    
+    await prisma.customer.create ({
       data:{         
-          customerName :  customerName ,
-          customerEmail :   customerEmail  ,
-            customerMobile: customerMobile  ,
-            customerAddress:	 customerAddress,   
-            baseStore	 :baseStore,
-            customerMembership:	  customerMembership  
+        customerName :  customerName ,
+        customerEmail :   customerEmail  ,
+        customerMobile: customerMobile  ,
+        customerAddress:	 customerAddress,   
+        baseStore	 :baseStore,
+        customerMembership:	  customerMembership  
       }    
     }) 
-  return  res.json ({status:200,message:" new Customers "})
+    return  res.json ({status:200,message:" new Customers "})
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to create customer' });
+  }
   }
 
   export const updateCustomer =async(req,res)=>{

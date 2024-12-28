@@ -13,6 +13,7 @@ router.patch('/delete/:id',deleteCustomer)
 router.get('/allvisits',allvisists)
 router.get('/allcustomer',allCustomer)
 router.post('/visit',createVisit)
+// router.patch('/visit',updateVisit)
 
 
 export default router

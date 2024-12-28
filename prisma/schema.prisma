@@ -1,10 +1,11 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["prismaSchemaFolder"]
 }
 
 model login {
@@ -16,24 +17,24 @@ model login {
   userStatus   Boolean @default(true)
 }
 
-model customer{
-  customerId       Int        @id @default(autoincrement())
-customerName     String     @db.VarChar(255)
-customerEmail    String     @db.VarChar(255)
-	customerMobile String     @db.VarChar(255)
-	customerAddress	 String     @db.VarChar(255)
-	baseStore	 Int   
-	customerMembership	 String     @db.VarChar(255)
-  create_at    DateTime   @default(now()) @db.Timestamp(6)
-  update_at    DateTime?  @db.Timestamp(6)
-  isDeleted    Boolean    @default(false)
-  customerVisits  customer_visit[]
+model customer {
+  customerId         Int              @id @default(autoincrement())
+  customerName       String           @db.VarChar(255)
+  customerEmail      String           @db.VarChar(255)
+  customerMobile     String           @db.VarChar(255)
+  customerAddress    String           @db.VarChar(255)
+  baseStore          Int
+  customerMembership String           @db.VarChar(255)
+  create_at          DateTime         @default(now()) @db.Timestamp(6)
+  update_at          DateTime?        @db.Timestamp(6)
+  isDeleted          Boolean          @default(false)
+  customerVisits     customer_visit[]
 }
 
 model customer_visit {
-  visitId             Int      @id @default(autoincrement())
+  visitId            Int       @id @default(autoincrement())
   storeId            Int?
-  customerId         Int 
+  customerId         Int
   eventDate          DateTime?
   sampleDate         DateTime?
   boomerangDate      DateTime?
@@ -46,50 +47,105 @@ model customer_visit {
   supervisorId       Int?
   catalystId         Int?
   consultantId       Int?
-  serviceType        String   @default("FSS")
+  serviceType        String    @default("FSS")
   notes              String?
-  status             String   @default("ACTIVE")
+  status             String    @default("ACTIVE")
   remarks            String?
   createdBy          Int?
-  create_at    DateTime   @default(now()) @db.Timestamp(6)
-  update_at    DateTime?  @db.Timestamp(6)
+  create_at          DateTime  @default(now()) @db.Timestamp(6)
+  update_at          DateTime? @db.Timestamp(6)
 
-visitedStore store? @relation(fields: [storeId],references: [storeId])
+  visitedStore    store?   @relation(fields: [storeId], references: [storeId])
   customerVisited customer @relation(fields: [customerId], references: [customerId])
   userCreateds    users?   @relation(fields: [createdBy], references: [userId])
+}
 
+model master_events{
+  eventId           Int      @id @default(autoincrement())
+  eventName         String  @db.VarChar(255)  
+  eventType         String?  @default("BRIDAL")
+  categoryId        Int?     
+ create_at          DateTime  @default(now()) @db.Timestamp(6)
+  update_at          DateTime? @db.Timestamp(6)
+  isDeleted             Boolean          @default(false)
+}
+model master_supplier_categories{
+  categoryId           Int      @id @default(autoincrement())
+  categoryName         String  @db.VarChar(255)
+ create_at          DateTime  @default(now()) @db.Timestamp(6)
+  update_at          DateTime? @db.Timestamp(6)
+  isDeleted             Boolean          @default(false)
+}
+model master_lead_source{
+  sourceId           Int      @id @default(autoincrement())
+  source            String @db.VarChar(255)
+ create_at          DateTime  @default(now()) @db.Timestamp(6)
+  update_at         DateTime? @db.Timestamp(6)
+  isDeleted         Boolean   @default(false)
+}
+model master_color_category{
+ colorcategoryId           Int      @id @default(autoincrement())
+  colorcategory            String @db.VarChar(255)
+ create_at          DateTime  @default(now()) @db.Timestamp(6)
+  update_at         DateTime? @db.Timestamp(6)
+  isDeleted         Boolean   @default(false)
+}
+model master_material{
+ materialId           Int      @id @default(autoincrement())
+  materialName           String @db.VarChar(255)
+ create_at          DateTime  @default(now()) @db.Timestamp(6)
+  update_at         DateTime? @db.Timestamp(6)
+  isDeleted         Boolean   @default(false)
+}
+model master_price_range{
+ rangeId           Int      @id @default(autoincrement())
+  range           String @db.VarChar(255)
+ create_at          DateTime  @default(now()) @db.Timestamp(6)
+  update_at         DateTime? @db.Timestamp(6)
+  isDeleted         Boolean   @default(false)
+}
+model city{
+ cityId           Int      @id @default(autoincrement())
+  city           String @db.VarChar(255)
+ create_at          DateTime  @default(now()) @db.Timestamp(6)
+  update_at         DateTime? @db.Timestamp(6)
+  isDeleted         Boolean   @default(false)
+}
+
+
+model terms_and_conditions{
+  termsID           Int      @id @default(autoincrement())
+  terms_type        String   @db.VarChar(255)
+  terms             String   @db.VarChar(255)
+ create_at          DateTime  @default(now()) @db.Timestamp(6)
+  update_at         DateTime? @db.Timestamp(6)
+  isDeleted         Boolean   @default(false)
 }
 
 model users {
-  userId       Int        @id @default(autoincrement())
-  userName     String     @db.VarChar(255)
-  userEmail    String     @db.VarChar(255)
-  userPassword String     @db.VarChar(255)
-  create_at    DateTime   @default(now()) @db.Timestamp(6)
-  update_at    DateTime?  @db.Timestamp(6)
-  isDeleted    Boolean    @default(false)
-  roles        user_roles[]
-  stores store_users[]  // Cascade on delete
-   visitorCreated customer_visit[]
+  userId         Int              @id @default(autoincrement())
+  userName       String           @db.VarChar(255)
+  userEmail      String           @db.VarChar(255)
+  userPassword   String           @db.VarChar(255)
+  create_at      DateTime         @default(now()) @db.Timestamp(6)
+  update_at      DateTime?        @db.Timestamp(6)
+  isDeleted      Boolean          @default(false)
+  roles          user_roles[]
+  stores         store_users[] // Cascade on delete
+  visitorCreated customer_visit[]
 }
-
-
-
 
 model role {
-  roleId      Int              @id @default(autoincrement())
+  roleId      Int                @id @default(autoincrement())
   roleName    String
-  permissions role_permissions[]  // Cascade on delete
-  users       user_roles[] 
+  permissions role_permissions[] // Cascade on delete
+  users       user_roles[]
 }
 
-
-
-
 model global_permission {
-  permissionId Int              @id @default(autoincrement())
-  permission   String           @db.VarChar(100)
-  roles         role_permissions[]  // Cascade on delete
+  permissionId Int                @id @default(autoincrement())
+  permission   String             @db.VarChar(100)
+  roles        role_permissions[] // Cascade on delete
 }
 
 model user_roles {
@@ -117,35 +173,34 @@ model role_permissions {
 
 
 model store {
-  storeId        Int        @id @default(autoincrement())
-  storeName     String     @db.VarChar(255)
-  storeShortName    String     @db.VarChar(255)
-  storeAddress String     @db.VarChar(255)
-  storeLattitude String     @db.VarChar(255)
-  storeLongitude String     @db.VarChar(255)
-  storePhone String     @db.VarChar(255)
-  storeGST String     @db.VarChar(255)
-  storeAPIKey String     @db.VarChar(255)
-  alternateStoreName    String   @db.VarChar(255)
-  alternateStoreAddress String     @db.VarChar(255)
-  alternateStoreGST String     @db.VarChar(255)
-  invoicePrefix String     @db.VarChar(255)
-  invoiceNumber Int     
-  whatsappNumber String     @db.VarChar(255)
-  whatsappAPI String  ?   @db.VarChar(255)
-  create_at    DateTime   @default(now()) @db.Timestamp(6)
-  update_at    DateTime?  @db.Timestamp(6)
-  isDeleted    Boolean    @default(false)
-  user        store_users[]   
-  customerVisited customer_visit[] 
+  storeId               Int              @id @default(autoincrement())
+  storeName             String           @db.VarChar(255)
+  storeShortName        String           @db.VarChar(255)
+  storeAddress          String           @db.VarChar(255)
+  storeLattitude        String           @db.VarChar(255)
+  storeLongitude        String           @db.VarChar(255)
+  storePhone            String           @db.VarChar(255)
+  storeGST              String           @db.VarChar(255)
+  storeAPIKey           String           @db.VarChar(255)
+  alternateStoreName    String           @db.VarChar(255)
+  alternateStoreAddress String           @db.VarChar(255)
+  alternateStoreGST     String           @db.VarChar(255)
+  invoicePrefix         String           @db.VarChar(255)
+  invoiceNumber         Int
+  whatsappNumber        String           @db.VarChar(255)
+  whatsappAPI           String?          @db.VarChar(255)
+  create_at             DateTime         @default(now()) @db.Timestamp(6)
+  update_at             DateTime?        @db.Timestamp(6)
+  isDeleted             Boolean          @default(false)
+  user                  store_users[]
+  customerVisited       customer_visit[]
 }
 
-
-
 model store_users {
-  storeId Int
-  userId  Int
-  storeUser   store @relation(fields: [storeId], references: [storeId], onDelete: Cascade)
-  userStore    users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  storeId   Int
+  userId    Int
+  storeUser store @relation(fields: [storeId], references: [storeId], onDelete: Cascade)
+  userStore users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
   @@id([storeId, userId]) // Composite primary key
 }

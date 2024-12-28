@@ -41,25 +41,7 @@ export const createVisit = async (req, res) => {
     } = req.body;
   
     // Validate all fields are provided
-    if (
-      !storeId ||
-      !customerId ||
-      !eventDate ||
-      !sampleDate ||
-      !boomerangDate ||
-      !purchaseDate ||
-      !cityId ||
-      !bridalEvents ||
-      !generalOcassions ||
-      !salesPersonId ||
-      !supportExecutiveId ||
-      !supervisorId ||
-      !catalystId ||
-      !consultantId ||
-      !serviceType ||
-      !notes ||
-      !status ||
-      !remarks ||
+    if ( !storeId ||!customerId ||!eventDate || !sampleDate ||!boomerangDate ||!purchaseDate ||!cityId ||!bridalEvents ||!generalOcassions ||!salesPersonId ||!supportExecutiveId ||!supervisorId ||!catalystId ||!consultantId ||!serviceType ||!notes ||!status ||!remarks ||
       !createdBy
     ) {
       return res.status(400).json({
@@ -83,26 +65,7 @@ export const createVisit = async (req, res) => {
   
       // Create the customer visit
       const newVisit = await prisma.customer_visit.create({
-        data: {
-          storeId,
-          customerId,
-          eventDate,
-          sampleDate,
-          boomerangDate,
-          purchaseDate,
-          cityId,
-          bridalEvents,
-          generalOcassions,
-          salesPersonId,
-          supportExecutiveId,
-          supervisorId,
-          catalystId,
-          consultantId,
-          serviceType,
-          notes,
-          status,
-          remarks,
-          createdBy,
+        data: {storeId,customerId,  eventDate, sampleDate, boomerangDate, purchaseDate, cityId, bridalEvents, generalOcassions, salesPersonId, supportExecutiveId, supervisorId, catalystId, consultantId, serviceType, notes, status, remarks, createdBy,
         },
       });
   
@@ -122,3 +85,29 @@ export const createVisit = async (req, res) => {
     }
   };
   
+
+
+  const  updateVisit =async (req,res)=>{
+    const id = parseInt( req.params.id)
+
+
+    try {
+      const existingVisit = await prisma.customer_visit.findUnique({
+        where: { visitId: id },
+      });
+    
+      if (!existingVisit) {
+        return res.status(400).json({ error: 'Visiter is  not found  ' });}
+
+
+const updateVisiter=  await prisma.customer_visit.updateMany({
+  data:{
+    
+  }
+})
+
+    } catch (error) {
+      
+    }
+
+  }
