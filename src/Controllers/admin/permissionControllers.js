@@ -35,3 +35,13 @@ export const createPermission = async (req, res) => {
       return res.status(500).json({ error: 'Failed to create permission' });
     }
   };
+
+
+  export const allpermission =async(req,res)=>{
+    try {
+  const allCitys= await prisma.global_permission.findMany () 
+  return  res.json ({status:200,message:" all  permisson ",data:allCitys})
+} catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to Show all events' }); 
+}}

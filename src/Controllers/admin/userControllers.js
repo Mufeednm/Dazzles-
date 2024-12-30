@@ -56,6 +56,8 @@ export const createUser = async (req, res) => {
 
 
 
+
+
   // update the user role and other details
 export const userUpdate=async (req,res)=>{
 const id = parseInt( req.params.id)
@@ -76,21 +78,27 @@ const updateUser= await prisma.users.updateMany({
       userName: username,
       // userEmail: email,
       userPassword: password, // Consider hashing the password (e.g., bcrypt)
-   
       update_at: new Date ()
     },
   });
-  await prisma.store_users.update({
-    where: {
-      storeId_userId: {
-        storeId: userStore,
+
+  if (userStore) {
+    // First, remove the user from any existing store
+    await prisma.store_users.deleteMany({
+      where: {
         userId: id,
       },
-    },
-    data: {
-      storeId: userStore,
-    },
-  });
+    });
+
+    // Now, add the new store association
+    await prisma.store_users.create({
+      data: {
+        userId: id,
+        storeId: userStore,
+      },
+    });
+  }
+
   
   await prisma.user_roles.deleteMany({
     where: { userId: id },
@@ -145,6 +153,59 @@ export const showUser = async (req, res) => {
     return res.status(500).json({ error: "Failed to retrieve users" });
   }
 };
+
+//  showw all users
+export const userDetails = async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const userDetails = await prisma.users.findMany({
+      where: {
+        userId: id, 
+      },
+      select: {
+        userId: true,
+        userName: true,
+        userEmail: true,
+        roles: {
+          include: {
+            role: {
+              select: {
+                roleName: true,
+                permissions: {
+                  select: {
+                    permission: {
+                      select: {
+                        permission: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Format the response to only return role names
+    const formattedUsers = userDetails.map((user) => ({
+      ...user,
+      roles: user.roles.map((userRole) => userRole.role.roleName),
+      permissions: user.roles.flatMap((userRole) => 
+        userRole.role.permissions.map((rolePermission) => rolePermission.permission.permission)
+      ),
+    }));
+    return res
+      .status(200)
+      .json({ message: "Users retrieved successfully", data: formattedUsers });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to retrieve users" });
+  }
+};
+
+
+
 
 //  delete user
 export const deleteUser = async (req, res) => {

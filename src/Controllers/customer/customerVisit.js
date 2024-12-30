@@ -25,15 +25,7 @@ export const allvisists = async (req, res) => {
 };
 
 
-export const  allCustomer =async (req,res)=>{
-    try {
-     const allcustomers=   await prisma.customer.findMany()
-        return res.status(200).json({message:"all staff ",data:allcustomers })
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Failed to delete customer' });  
-    }
-}
+
 
 export const createVisit = async (req, res) => {
     const { storeId,customerId,eventDate,sampleDate,boomerangDate,purchaseDate,cityId,bridalEvents,generalOcassions,salesPersonId,supportExecutiveId, supervisorId, catalystId,consultantId,

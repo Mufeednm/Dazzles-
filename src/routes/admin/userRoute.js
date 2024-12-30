@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticateJWT } from "../../middlewares/authenticateToken.js";
 import { checkPermission } from "../../middlewares/permissionAllowed.js";
-import { createUser, deleteUser, showUser, userUpdate } from "../../Controllers/admin/userControllers.js";
+import { createUser, deleteUser, showUser, userDetails, userUpdate } from "../../Controllers/admin/userControllers.js";
 
 const router =Router()
 
@@ -10,6 +10,8 @@ const router =Router()
 //  user crud
 router.post('/user',authenticateJWT,checkPermission("Add User"),createUser) 
 router.get('/allusers', showUser)  
+
+router.get('/users/:id', userDetails)  
 // router.get('/allusers',authenticateJWT,checkPermission("show_User"), showUser)  
 router.patch('/userupdate/:id',userUpdate)  
 // router.patch('/userupdate/:id',authenticateJWT,userUpdate)  

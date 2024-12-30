@@ -204,3 +204,33 @@ model store_users {
 
   @@id([storeId, userId]) // Composite primary key
 }
+
+model products_category{
+  productsCategoryId     Int      @id @default(autoincrement())
+productsCategory        String           @db.VarChar(255)
+  create_at             DateTime         @default(now()) @db.Timestamp(6)
+  update_at             DateTime?        @db.Timestamp(6)
+  isDeleted             Boolean          @default(false)
+}
+model products_color{
+  productsColorId     Int      @id @default(autoincrement())
+productsColor       String           @db.VarChar(255)
+  create_at             DateTime         @default(now()) @db.Timestamp(6)
+  update_at             DateTime?        @db.Timestamp(6)
+  isDeleted             Boolean          @default(false)
+}
+model hsn{
+hsnId     Int      @id @default(autoincrement())
+hsn       String           @db.VarChar(255)
+taxPercent       String           @db.VarChar(255)
+  create_at             DateTime         @default(now()) @db.Timestamp(6)
+  update_at             DateTime?        @db.Timestamp(6)
+  isDeleted             Boolean          @default(false)
+}
+model expense_categoriesn{
+expenseCategoryId  Int      @id @default(autoincrement())
+	expenseCategory       String           @db.VarChar(255)
+  create_at             DateTime         @default(now()) @db.Timestamp(6)
+  update_at             DateTime?        @db.Timestamp(6)
+  isDeleted             Boolean          @default(false)
+}
