@@ -4,17 +4,7 @@ export const allvisists = async (req, res) => {
     try {
         const visiters = await prisma.customer_visit.findMany({
             include: {
-              // Include the relation field for the user who created the visit
-                visitedStore: {    // Assuming this is a relation field for the store
-                    select: {
-                        storeName: true, // Select only the store name from the related store
-                    },
-                },
-                userCreateds:{
-                    select:{
-                        userName:true
-                    }
-                }
+          customerVisited:true
             },
         });
         return res.status(200).json({ message: "All visitors", data: visiters });
@@ -23,6 +13,37 @@ export const allvisists = async (req, res) => {
         return res.status(500).json({ error: "Failed to show all visitors" });
     }
 };
+
+export const searchCustomerByNumber = async (req, res) => {
+  const { number } = req.query; // Retrieve the query parameter from the request
+  console.log(number);
+  if (!number) {
+      return res.status(400).json({ error: "Number query parameter is required" });
+  }
+
+  try {
+      const customers = await prisma.customer.findMany({
+          where: {
+            customerMobile: {
+                  contains: number, // Perform a partial match (use Prisma's 'contains' for LIKE behavior)
+              },
+          },
+          include: {
+            customerVisits: true, // Include related data as needed
+          },
+      });
+
+      if (customers.length === 0) {
+          return res.status(404).json({ message: "No customers found matching the number" });
+      }
+
+      return res.status(200).json({ message: "Customers found", data: customers });
+  } catch (error) {
+      console.error("Error searching for customers:", error);
+      return res.status(500).json({ error: "Failed to search for customers" });
+  }
+};
+
 
 
 

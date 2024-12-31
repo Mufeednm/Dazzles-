@@ -21,9 +21,9 @@ model customer {
   customerId         Int              @id @default(autoincrement())
   customerName       String           @db.VarChar(255)
   customerEmail      String           @db.VarChar(255)
-  customerMobile     String           @db.VarChar(255)
+  customerMobile     String           @db.VarChar(255) @unique
   customerAddress    String           @db.VarChar(255)
-  baseStore          Int
+  baseStore          Int?
   customerMembership String           @db.VarChar(255)
   create_at          DateTime         @default(now()) @db.Timestamp(6)
   update_at          DateTime?        @db.Timestamp(6)

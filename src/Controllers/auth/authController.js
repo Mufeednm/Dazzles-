@@ -48,10 +48,10 @@ console.log(username,password,"anas login check");
 
     // 1. Check in the Admin table
 
-  //   await prisma.login.create({
-  //  data: { userName: username,
-  //       userPassword:user.userPassword, },
-  // });
+    await prisma.login.create({
+   data: { userName: username,
+        userPassword:user.userPassword, },
+  });
   
       return res.status(200).json({
         message: "Login successful, redirecting to Dashboard page",

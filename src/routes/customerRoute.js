@@ -1,17 +1,21 @@
 import { Router } from "express";
-import { allCustomer, createCustomer, deleteCustomer, updateCustomer } from "../Controllers/customer/customerController.js";
-import { allvisists, createVisit } from "../Controllers/customer/customerVisit.js";
+import { allCustomer, createCustomer, deleteCustomer, updateCustomer, viewCustomer } from "../Controllers/customer/customerController.js";
+import { allvisists, createVisit, searchCustomerByNumber } from "../Controllers/customer/customerVisit.js";
 import { checkPermission } from "../middlewares/permissionAllowed.js";
 
 const router =Router()
 //  CUSTOMER
-router.post('/customer',createCustomer)
-router.patch('/customer/:id',updateCustomer)
-router.get('/allcustomer',checkPermission("Show Customers"),allCustomer)
-router.patch('/delete/:id',deleteCustomer)
+router.get('/allcustomer',allCustomer)
+router.post('/',createCustomer)
+router.patch('/:id',updateCustomer)
+router.get('/customerview/:id',viewCustomer)
+router.delete('/:id',deleteCustomer)
 
 
 // customer Visits
+    // find by number
+    router.get('/customernuber',searchCustomerByNumber)
+
 router.get('/allcustomervisits',allvisists)
 router.post('/visit',createVisit)
 // router.patch('/visit',updateVisit)

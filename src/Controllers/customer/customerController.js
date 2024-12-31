@@ -1,23 +1,37 @@
 import prisma from "../../database/db.config.js"
 
 export const createCustomer =async(req,res)=>{
-    const {customerName ,customerEmail,customerMobile ,customerAddress,baseStore,customerMembership}=req.body
+    const {customerName ,customerEmail,customerMobile ,customerAddress,customerMembership}=req.body
   try {
-    
+    const existingCustomer = await prisma.customer.findFirst({
+      where: {
+          OR: [
+              { customerName: customerName },
+              { customerMobile: customerMobile },
+          ],
+      },
+  });
+
+  if (existingCustomer) {
+      const duplicateField = existingCustomer.customerName === customerName 
+          ? "name" 
+          : "mobile number";
+      return res.status(400).json({ error: `This ${duplicateField} is already registered.` });
+  }
+
     await prisma.customer.create ({
       data:{         
         customerName :  customerName ,
         customerEmail :   customerEmail  ,
         customerMobile: customerMobile  ,
         customerAddress:	 customerAddress,   
-        baseStore	 :baseStore,
         customerMembership:	  customerMembership  
       }    
     }) 
     return  res.json ({status:200,message:" new Customers "})
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'Failed to create customer' });
+    return res.status(500).json({error, errormessage: 'Failed to create customer' });
   }
   }
 
@@ -45,10 +59,31 @@ export const createCustomer =async(req,res)=>{
     
   }}
 
+  export const viewCustomer =async(req,res)=>{
+
+    const id = parseInt(req.params.id);
+  try {
+    
+
+ const customer =await prisma.customer.findUnique ({
+    where:{customerId:id}}) 
+  return  res.json ({status:200,message:" new Customers ",data:customer})
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Failed to update customer' });
+    
+    }
+  
+  }
+
+
+
+
 
   export const  allCustomer =async (req,res)=>{
     try {
      const allcustomers=   await prisma.customer.findMany({
+      where:{isDeleted:false},
       select: {
         customerId: true,
         customerName: true,
@@ -58,7 +93,6 @@ export const createCustomer =async(req,res)=>{
         baseStore: true,
         customerMembership: true,}
      })
-     console.log(allcustomers);
         return res.status(200).json({message:"all staff ",data:allcustomers })
     } catch (error) {
         console.error(error);
