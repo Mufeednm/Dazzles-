@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { allCustomer, createCustomer, deleteCustomer, updateCustomer, viewCustomer } from "../Controllers/customer/customerController.js";
 import { allvisists, createVisit, searchCustomerByNumber } from "../Controllers/customer/customerVisit.js";
-import { checkPermission } from "../middlewares/permissionAllowed.js";
 
 const router =Router()
 //  CUSTOMER
