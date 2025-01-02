@@ -2,7 +2,7 @@ import prisma from "../../database/db.config.js"
 import { customerjoi } from "../../database/model_validation/customer_Validate.js";
 
 export const createCustomer =async(req,res)=>{
-    const {customerName ,customerEmail,customerMobile ,customerAddress,customerMembership}=req.body
+    const {customerName ,customerMobile ,customerAddress,customerMembership}=req.body
   try {
 
     const { error } = customerjoi.validate(req.body);
@@ -29,7 +29,6 @@ export const createCustomer =async(req,res)=>{
     await prisma.customer.create ({
       data:{         
         customerName :  customerName ,
-        customerEmail :   customerEmail  ,
         customerMobile: customerMobile  ,
         customerAddress:	 customerAddress,   
         customerMembership:	  customerMembership  
@@ -59,7 +58,6 @@ export const createCustomer =async(req,res)=>{
     where:{customerId:id},
       data:{         
           customerName :  customerName ,
-          customerEmail :   customerEmail  ,
             customerMobile: customerMobile  ,
             customerAddress:	 customerAddress,   
             customerMembership:	  customerMembership  
@@ -88,31 +86,128 @@ export const createCustomer =async(req,res)=>{
     }
   
   }
-
-
-
-
-
-  export const  allCustomer =async (req,res)=>{
+  
+  export const allCustomer = async (req, res) => {
     try {
-     const allcustomers=   await prisma.customer.findMany({
-      where:{isDeleted:false},
-      select: {
-        customerId: true,
-        customerName: true,
-        customerEmail: true,
-        customerMobile: true,
-        customerAddress: true,
-        baseStore: true,
-        customerMembership: true,}
-     })
-        return res.status(200).json({message:"all staff ",data:allcustomers })
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Failed to delete customer' });  
-    }
-}
+        let { page = '1', limit = '10', search = '' } = req.query;
 
+        // Validate and parse page and limit
+        page = parseInt(page, 10);
+        limit = parseInt(limit, 10);
+
+        if (isNaN(page) || page <= 0) page = 1; // Default to 1 if invalid
+        if (isNaN(limit) || limit <= 0) limit = 10; // Default to 10 if invalid
+
+        console.log(req.query, "Validated page and limit values");
+
+        const skip = (page - 1) * limit;
+        const take = limit;
+
+        const where = {
+            isDeleted: false,
+            OR: search
+                ? [
+                      { customerName: { contains: search, mode: 'insensitive' } },
+                      { customerMobile: { contains: search, mode: 'insensitive' } },
+                  ]
+                : undefined,
+        };
+
+        const allcustomers = await prisma.customer.findMany({
+            where,
+            select: {
+                customerId: true,
+                customerName: true,
+                customerMobile: true,
+                customerAddress: true,
+                baseStore: true,
+                customerMembership: true,
+            },
+            skip,
+            take,
+        });
+
+        const totalCustomers = await prisma.customer.count({ where });
+
+        if (totalCustomers === 0) {
+            return res.status(404).json({ message: 'No customers found matching the search criteria.' });
+        }
+
+        return res.status(200).json({
+            message: 'All customers fetched successfully',
+            data: allcustomers,
+            total: totalCustomers,
+            page: page,
+            pages: Math.ceil(totalCustomers / take),
+        });
+    } catch (error) {
+        console.error('Error fetching customers:', error);
+        return res.status(500).json({ error: 'Failed to fetch customers' });
+    }
+};
+
+//   export const allCustomer = async (req, res) => {
+//     try {
+//         // Destructure query parameters and set default values
+//         let { page = '1', limit = '10', search = '' } = req.query;
+
+//         // Validate and parse page and limit to integers
+//         page = parseInt(page);
+//         limit = parseInt(limit);
+
+//         // Check for NaN and set default values if necessary
+//         if (isNaN(page) || page <= 0) page = 1; // Default to 1 if page is invalid
+//         if (isNaN(limit) || limit <= 0) limit = 10; // Default to 10 if limit is invalid
+
+//         console.log(req.query, "Validated page and limit values");
+
+//         // Calculate pagination values
+//         const take = limit;
+//         const skip = (page - 1) * limit;
+
+//         const where = {
+//             isDeleted: false,
+//             OR: search
+//                 ? [
+//                       { customerName: { contains: search, mode: 'insensitive' } },
+//                       { customerMobile: { contains: search, mode: 'insensitive' } },
+//                   ]
+//                 : undefined,
+//         };
+
+//         const allcustomers = await prisma.customer.findMany({
+//             where,
+//             select: {
+//                 customerId: true,
+//                 customerName: true,
+//                 customerMobile: true,
+//                 customerAddress: true,
+//                 baseStore: true,
+//                 customerMembership: true,
+//             },
+//             skip,
+//             take,
+//         });
+
+//         const totalCustomers = await prisma.customer.count({ where });
+
+//         // Handle no results
+//         if (totalCustomers === 0) {
+//             return res.status(404).json({ message: 'No customers found matching the search criteria.' });
+//         }
+
+//         return res.status(200).json({
+//             message: 'All customers fetched successfully',
+//             data: allcustomers,
+//             total: totalCustomers,
+//             page: page,
+//             pages: Math.ceil(totalCustomers / take),
+//         });
+//     } catch (error) {
+//         console.error('Error fetching customers:', error);
+//         return res.status(500).json({ error: 'Failed to fetch customers' });
+//     }
+// };
 
 
   export const deleteCustomer =async(req,res)=>{
@@ -130,6 +225,6 @@ export const createCustomer =async(req,res)=>{
 }); 
   return  res.json ({status:200,message:" deleted Customers "})
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Failed to delete customer' });
+      console.error(error<"errooor");
+      return res.status(500).json({ errorss: 'Failed to delete customer' });
   }}
