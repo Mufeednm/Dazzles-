@@ -1,8 +1,15 @@
 import prisma from "../../database/db.config.js"
+import { customerjoi } from "../../database/model_validation/customer_Validate.js";
 
 export const createCustomer =async(req,res)=>{
     const {customerName ,customerEmail,customerMobile ,customerAddress,customerMembership}=req.body
   try {
+
+    const { error } = customerjoi.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
     const existingCustomer = await prisma.customer.findFirst({
       where: {
           OR: [
@@ -35,11 +42,17 @@ export const createCustomer =async(req,res)=>{
   }
   }
 
+
+  
   export const updateCustomer =async(req,res)=>{
 
     const id = parseInt(req.params.id);
     const {customerName ,customerEmail,customerMobile ,customerAddress,customerMembership}=req.body
   try {
+        const { error } = customerjoi.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
     
 
  await prisma.customer.updateMany ({

@@ -1,19 +1,26 @@
 
 import prisma from "../../database/db.config.js";
 import bcrypt from "bcrypt";
+import { userjoi } from "../../database/model_validation/user_Validate.js";
 
 
 export const createUser = async (req, res) => {
   const { username, email, password, roleIds, userStore } = req.body;
 
-  if (!username || !email || !password || !roleIds || !userStore) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
+  // if (!username || !email || !password || !roleIds || !userStore) {
+  //   return res.status(400).json({ error: "All fields are required" });
+  // }
 
-  if (!Array.isArray(roleIds) || roleIds.length === 0) {
-    return res .status(400).json({ error: "Role IDs must be provided as a non-empty array" });}
+  // if (!Array.isArray(roleIds) || roleIds.length === 0) {
+  //   return res .status(400).json({ error: "Role IDs must be provided as a non-empty array" });}
 
   try {
+    const { error } = userjoi.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+
     // Check if the user already exists
     const existingUser = await prisma.users.findFirst({
       where: { userEmail: email },
@@ -64,6 +71,11 @@ const id = parseInt( req.params.id)
 const { username, email, password, roleIds, userStore } = req.body;
  
 try {
+  const { error } = userjoi.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
   const existingUser = await prisma.users.findUnique({
     where: { userId: id },
   });

@@ -10,5 +10,6 @@ router.use('/api/auth',loginRoute)
 router.use('/api/admin',adminRoutes)
 router.use('/api/customer',customerRoutes)
 router.use('/api/master',masterRoutes)
+router.use('/api/search',masterRoutes)
 
 export default router

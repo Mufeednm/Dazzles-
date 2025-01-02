@@ -1,11 +1,11 @@
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["prismaSchemaFolder"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model login {
@@ -19,13 +19,13 @@ model login {
 
 model customer {
   customerId         Int              @id @default(autoincrement())
-  customerName       String           @db.VarChar(255)
-  customerEmail      String           @db.VarChar(255)
-  customerMobile     String           @db.VarChar(255) @unique
-  customerAddress    String           @db.VarChar(255)
+  customerName       String?          @db.VarChar(255)
+  customerEmail      String?          @db.VarChar(255)
+  customerMobile     String           @db.VarChar(255)
+  customerAddress    String?          @db.VarChar(255)
   baseStore          Int?
-  customerMembership String           @db.VarChar(255)
-  create_at          DateTime         @default(now()) @db.Timestamp(6)
+  customerMembership String?          @db.VarChar(255)
+  create_at          DateTime?        @default(now()) @db.Timestamp(6)
   update_at          DateTime?        @db.Timestamp(6)
   isDeleted          Boolean          @default(false)
   customerVisits     customer_visit[]
@@ -54,72 +54,76 @@ model customer_visit {
   createdBy          Int?
   create_at          DateTime  @default(now()) @db.Timestamp(6)
   update_at          DateTime? @db.Timestamp(6)
-
-  visitedStore    store?   @relation(fields: [storeId], references: [storeId])
-  customerVisited customer @relation(fields: [customerId], references: [customerId])
-  userCreateds    users?   @relation(fields: [createdBy], references: [userId])
+  userCreateds       users?    @relation(fields: [createdBy], references: [userId])
+  customerVisited    customer  @relation(fields: [customerId], references: [customerId])
+  visitedStore       store?    @relation(fields: [storeId], references: [storeId])
 }
 
-model master_events{
-  eventId           Int      @id @default(autoincrement())
-  eventName         String  @db.VarChar(255)  
-  eventType         String?  @default("BRIDAL")
-  categoryId        Int?     
- create_at          DateTime  @default(now()) @db.Timestamp(6)
-  update_at          DateTime? @db.Timestamp(6)
-  isDeleted             Boolean          @default(false)
-}
-model master_supplier_categories{
-  categoryId           Int      @id @default(autoincrement())
-  categoryName         String  @db.VarChar(255)
- create_at          DateTime  @default(now()) @db.Timestamp(6)
-  update_at          DateTime? @db.Timestamp(6)
-  isDeleted             Boolean          @default(false)
-}
-model master_lead_source{
-  sourceId           Int      @id @default(autoincrement())
-  source            String @db.VarChar(255)
- create_at          DateTime  @default(now()) @db.Timestamp(6)
-  update_at         DateTime? @db.Timestamp(6)
-  isDeleted         Boolean   @default(false)
-}
-model master_color_category{
- colorcategoryId           Int      @id @default(autoincrement())
-  colorcategory            String @db.VarChar(255)
- create_at          DateTime  @default(now()) @db.Timestamp(6)
-  update_at         DateTime? @db.Timestamp(6)
-  isDeleted         Boolean   @default(false)
-}
-model master_material{
- materialId           Int      @id @default(autoincrement())
-  materialName           String @db.VarChar(255)
- create_at          DateTime  @default(now()) @db.Timestamp(6)
-  update_at         DateTime? @db.Timestamp(6)
-  isDeleted         Boolean   @default(false)
-}
-model master_price_range{
- rangeId           Int      @id @default(autoincrement())
-  range           String @db.VarChar(255)
- create_at          DateTime  @default(now()) @db.Timestamp(6)
-  update_at         DateTime? @db.Timestamp(6)
-  isDeleted         Boolean   @default(false)
-}
-model city{
- cityId           Int      @id @default(autoincrement())
-  city           String @db.VarChar(255)
- create_at          DateTime  @default(now()) @db.Timestamp(6)
-  update_at         DateTime? @db.Timestamp(6)
-  isDeleted         Boolean   @default(false)
+model master_events {
+  eventId    Int       @id @default(autoincrement())
+  eventName  String    @db.VarChar(255)
+  eventType  String?   @default("BRIDAL")
+  categoryId Int?
+  create_at  DateTime  @default(now()) @db.Timestamp(6)
+  update_at  DateTime? @db.Timestamp(6)
+  isDeleted  Boolean   @default(false)
 }
 
+model master_supplier_categories {
+  categoryId   Int       @id @default(autoincrement())
+  categoryName String    @db.VarChar(255)
+  create_at    DateTime  @default(now()) @db.Timestamp(6)
+  update_at    DateTime? @db.Timestamp(6)
+  isDeleted    Boolean   @default(false)
+}
 
-model terms_and_conditions{
-  termsID           Int      @id @default(autoincrement())
-  terms_type        String   @db.VarChar(255)
-  terms             String   @db.VarChar(255)
- create_at          DateTime  @default(now()) @db.Timestamp(6)
-  update_at         DateTime? @db.Timestamp(6)
-  isDeleted         Boolean   @default(false)
+model master_lead_source {
+  sourceId  Int       @id @default(autoincrement())
+  source    String    @db.VarChar(255)
+  create_at DateTime  @default(now()) @db.Timestamp(6)
+  update_at DateTime? @db.Timestamp(6)
+  isDeleted Boolean   @default(false)
+}
+
+model master_color_category {
+  colorcategoryId Int       @id @default(autoincrement())
+  colorcategory   String    @db.VarChar(255)
+  create_at       DateTime  @default(now()) @db.Timestamp(6)
+  update_at       DateTime? @db.Timestamp(6)
+  isDeleted       Boolean   @default(false)
+}
+
+model master_material {
+  materialId   Int       @id @default(autoincrement())
+  materialName String    @db.VarChar(255)
+  create_at    DateTime  @default(now()) @db.Timestamp(6)
+  update_at    DateTime? @db.Timestamp(6)
+  isDeleted    Boolean   @default(false)
+}
+
+model master_price_range {
+  rangeId   Int       @id @default(autoincrement())
+  range     String    @db.VarChar(255)
+  create_at DateTime  @default(now()) @db.Timestamp(6)
+  update_at DateTime? @db.Timestamp(6)
+  isDeleted Boolean   @default(false)
+}
+
+model city {
+  cityId    Int       @id @default(autoincrement())
+  city      String    @db.VarChar(255)
+  create_at DateTime  @default(now()) @db.Timestamp(6)
+  isDeleted Boolean   @default(false)
+  update_at DateTime? @db.Timestamp(6)
+}
+
+model terms_and_conditions {
+  termsID    Int       @id @default(autoincrement())
+  terms_type String    @db.VarChar(255)
+  terms      String    @db.VarChar(255)
+  create_at  DateTime  @default(now()) @db.Timestamp(6)
+  update_at  DateTime? @db.Timestamp(6)
+  isDeleted  Boolean   @default(false)
 }
 
 model users {
@@ -130,22 +134,22 @@ model users {
   create_at      DateTime         @default(now()) @db.Timestamp(6)
   update_at      DateTime?        @db.Timestamp(6)
   isDeleted      Boolean          @default(false)
-  roles          user_roles[]
-  stores         store_users[] // Cascade on delete
   visitorCreated customer_visit[]
+  stores         store_users[]
+  roles          user_roles[]
 }
 
 model role {
   roleId      Int                @id @default(autoincrement())
   roleName    String
-  permissions role_permissions[] // Cascade on delete
+  permissions role_permissions[]
   users       user_roles[]
 }
 
 model global_permission {
   permissionId Int                @id @default(autoincrement())
   permission   String             @db.VarChar(100)
-  roles        role_permissions[] // Cascade on delete
+  roles        role_permissions[]
 }
 
 model user_roles {
@@ -153,8 +157,8 @@ model user_roles {
   userId     Int
   roleId     Int
   assignedAt DateTime @default(now())
-  role       role     @relation(fields: [roleId], references: [roleId], onDelete: Cascade) // Cascade on delete
-  user       users    @relation(fields: [userId], references: [userId], onDelete: Cascade) // Cascade on delete
+  role       role     @relation(fields: [roleId], references: [roleId], onDelete: Cascade)
+  user       users    @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@unique([userId, roleId])
 }
@@ -165,12 +169,11 @@ model role_permissions {
   permissionId Int
   assignedAt   DateTime          @default(now())
   updateAt     DateTime?
-  permission   global_permission @relation(fields: [permissionId], references: [permissionId], onDelete: Cascade) // Cascade on delete
-  role         role              @relation(fields: [roleId], references: [roleId], onDelete: Cascade) // Cascade on delete
+  permission   global_permission @relation(fields: [permissionId], references: [permissionId], onDelete: Cascade)
+  role         role              @relation(fields: [roleId], references: [roleId], onDelete: Cascade)
 
   @@unique([roleId, permissionId])
 }
-
 
 model store {
   storeId               Int              @id @default(autoincrement())
@@ -192,8 +195,8 @@ model store {
   create_at             DateTime         @default(now()) @db.Timestamp(6)
   update_at             DateTime?        @db.Timestamp(6)
   isDeleted             Boolean          @default(false)
-  user                  store_users[]
   customerVisited       customer_visit[]
+  user                  store_users[]
 }
 
 model store_users {
@@ -202,35 +205,38 @@ model store_users {
   storeUser store @relation(fields: [storeId], references: [storeId], onDelete: Cascade)
   userStore users @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
-  @@id([storeId, userId]) // Composite primary key
+  @@id([storeId, userId])
 }
 
-model products_category{
-  productsCategoryId     Int      @id @default(autoincrement())
-productsCategory        String           @db.VarChar(255)
-  create_at             DateTime         @default(now()) @db.Timestamp(6)
-  update_at             DateTime?        @db.Timestamp(6)
-  isDeleted             Boolean          @default(false)
+model products_category {
+  productsCategoryId Int       @id @default(autoincrement())
+  productsCategory   String    @db.VarChar(255)
+  create_at          DateTime  @default(now()) @db.Timestamp(6)
+  update_at          DateTime? @db.Timestamp(6)
+  isDeleted          Boolean   @default(false)
 }
-model products_color{
-  productsColorId     Int      @id @default(autoincrement())
-productsColor       String           @db.VarChar(255)
-  create_at             DateTime         @default(now()) @db.Timestamp(6)
-  update_at             DateTime?        @db.Timestamp(6)
-  isDeleted             Boolean          @default(false)
+
+model products_color {
+  productsColorId Int       @id @default(autoincrement())
+  productsColor   String    @db.VarChar(255)
+  create_at       DateTime  @default(now()) @db.Timestamp(6)
+  update_at       DateTime? @db.Timestamp(6)
+  isDeleted       Boolean   @default(false)
 }
-model hsn{
-hsnId     Int      @id @default(autoincrement())
-hsn       String           @db.VarChar(255)
-taxPercent       String           @db.VarChar(255)
-  create_at             DateTime         @default(now()) @db.Timestamp(6)
-  update_at             DateTime?        @db.Timestamp(6)
-  isDeleted             Boolean          @default(false)
+
+model hsn {
+  hsnId      Int       @id @default(autoincrement())
+  hsn        String    @db.VarChar(255)
+  taxPercent String    @db.VarChar(255)
+  create_at  DateTime  @default(now()) @db.Timestamp(6)
+  update_at  DateTime? @db.Timestamp(6)
+  isDeleted  Boolean   @default(false)
 }
-model expense_categoriesn{
-expenseCategoryId  Int      @id @default(autoincrement())
-	expenseCategory       String           @db.VarChar(255)
-  create_at             DateTime         @default(now()) @db.Timestamp(6)
-  update_at             DateTime?        @db.Timestamp(6)
-  isDeleted             Boolean          @default(false)
+
+model expense_categoriesn {
+  expenseCategoryId Int       @id @default(autoincrement())
+  expenseCategory   String    @db.VarChar(255)
+  create_at         DateTime  @default(now()) @db.Timestamp(6)
+  update_at         DateTime? @db.Timestamp(6)
+  isDeleted         Boolean   @default(false)
 }

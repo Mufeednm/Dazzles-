@@ -44,9 +44,9 @@ router.patch('/deletepricerange/:id',deletepricerange)
 
 // Supplier Category
 router.post('/suppliercategory',Create_Supplier_category)
-router.get('/allsuppliercategory',allSupplier_category)
-router.patch('/updatesuppliercategory/:id',update_Supplier_category)
-router.patch('/deletesuppliercategory/:id',delete_Supplier_category)
+router.get('/suppliercategory',allSupplier_category)
+router.patch('/suppliercategory/:id',update_Supplier_category)
+router.delete('/suppliercategory/:id',delete_Supplier_category)
 
 
 export default router
